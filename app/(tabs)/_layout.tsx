@@ -24,12 +24,27 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Home',
+          tabBarStyle: {
+            display: 'none',
+          },
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="login"
         options={{
-          title: 'Send',
+          title: 'login',
+          tabBarStyle: {
+            display: 'none',
+          },
+        }}
+      />
+      <Tabs.Screen
+        name="register"
+        options={{
+          title: 'register',
+          tabBarStyle: {
+            display: 'none',
+          },
         }}
       />
     </Tabs>
