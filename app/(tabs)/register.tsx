@@ -60,7 +60,7 @@ const LoginScreen = () => {
 
         {/* Continue Button */}
         <TouchableOpacity style={styles.continueButton}>
-          <Text style={styles.continueButtonText}>Continue</Text>
+          <Text style={styles.continueButtonText}>Sign up</Text>
         </TouchableOpacity>
 
         {/* Can't Sign Up Link */}
@@ -113,10 +113,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#1A1A2E', // Dark background
     alignItems: 'center',
     paddingHorizontal: 20,
+    paddingTop: 40
   },
   backButton: {
     position: 'absolute', // Position it absolutely
-    top: 16, // Adjust top spacing
+    top: 35, // Adjust top spacing
     left: 20, // Adjust left spacing
     zIndex: 10, // Ensure it's above other elements
     padding: 10, // Add padding for easier tapping

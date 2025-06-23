@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react'; // Import useEffect and useRef
 import {
   View,
   Text,
@@ -9,18 +9,64 @@ import {
   Image,
 } from 'react-native';
 import { ChevronRight, Sparkles, ArrowLeft } from 'lucide-react-native';
-import { useRouter } from 'expo-router'; // Ensure useRouter is imported
+import { useRouter } from 'expo-router';
 
 const LoginScreen = () => {
-  const router = useRouter(); // Initialize the router hook
+  const router = useRouter();
+  const [email, setEmail] = useState('');
+  const [emailError, setEmailError] = useState(false); // State for email error
+  const errorTimerRef = useRef<NodeJS.Timeout | null>(null); // Ref to store the timer ID
 
   const handleGoBack = () => {
     router.back();
   };
 
   const handleGoToRegister = () => {
-    router.push('/register'); // Navigate to the register screen
+    router.push('/register');
   };
+
+  const handleContinue = () => {
+    // Clear any existing timer when attempting to continue
+    if (errorTimerRef.current) {
+      clearTimeout(errorTimerRef.current);
+    }
+
+    if (email.trim() === '') {
+      setEmailError(true); // Set error state to true
+      // Set a timer to clear the error after 3 seconds
+      errorTimerRef.current = setTimeout(() => {
+        setEmailError(false);
+        errorTimerRef.current = null; // Clear the ref after timer fires
+      }, 3000); // 3000ms = 3 seconds
+    } else {
+      setEmailError(false); // Clear error state if input is valid
+      console.log('Email entered:', email);
+      // In a real app, you would perform authentication or navigate
+      // router.push('/dashboard'); // Example navigation after successful input
+    }
+  };
+
+  // Function to handle text input changes and clear error immediately
+  // and clear any auto-dismiss timer if the user starts typing
+  const handleEmailChange = (text: string) => {
+    setEmail(text);
+    if (emailError) { // If there was an error showing
+      setEmailError(false); // Clear error immediately when user types
+      if (errorTimerRef.current) { // Clear the auto-dismiss timer
+        clearTimeout(errorTimerRef.current);
+        errorTimerRef.current = null;
+      }
+    }
+  };
+
+  // Clean up the timer when the component unmounts
+  useEffect(() => {
+    return () => {
+      if (errorTimerRef.current) {
+        clearTimeout(errorTimerRef.current);
+      }
+    };
+  }, []); // Empty dependency array means this runs once on mount and once on unmount
 
   return (
     <View style={styles.container}>
@@ -33,13 +79,10 @@ const LoginScreen = () => {
 
       {/* Header Section with Logo and App Name */}
       <View style={styles.headerSection}>
-        {/* Using Sparkles as a placeholder for the custom swirl logo */}
-        {/* <Sparkles size={60} color="#00BCD4" style={styles.logoIcon} /> */}
         <Image
           source={require('../assets/images/prosecraft1-logo.png')}
           style={styles.logoImage}
         />
-        {/* <Text style={styles.appName}>PROSECRAFT</Text> */}
       </View>
 
       {/* Login Card */}
@@ -47,22 +90,31 @@ const LoginScreen = () => {
         {/* Sign In Header */}
         <View style={styles.signInHeader}>
           <Text style={styles.signInText}>Sign in</Text>
-          <TouchableOpacity onPress={handleGoToRegister}> {/* Add onPress handler here */}
+          <TouchableOpacity onPress={handleGoToRegister}>
             <Text style={styles.dontHaveAccountText}>I don't have an account</Text>
           </TouchableOpacity>
         </View>
 
         {/* Email Input */}
         <TextInput
-          style={styles.emailInput}
+          style={[
+            styles.emailInput,
+            emailError && styles.emailInputError // Apply error style conditionally
+          ]}
           placeholder="Email"
           placeholderTextColor="#888"
           keyboardType="email-address"
           autoCapitalize="none"
+          value={email}
+          onChangeText={handleEmailChange} // Use the new handler
         />
+        {/* Error message tooltip */}
+        {emailError && (
+          <Text style={styles.errorMessage}>Email field must not be empty.</Text>
+        )}
 
         {/* Continue Button */}
-        <TouchableOpacity style={styles.continueButton}>
+        <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
           <Text style={styles.continueButtonText}>Continue</Text>
         </TouchableOpacity>
 
@@ -116,10 +168,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#1A1A2E',
     alignItems: 'center',
     paddingHorizontal: 20,
+    paddingTop: 40,
   },
   backButton: {
     position: 'absolute',
-    top: 16,
+    top: 40,
     left: 20,
     zIndex: 10,
     padding: 10,
@@ -171,14 +224,29 @@ const styles = StyleSheet.create({
     fontSize: 18,
     padding: 15,
     borderRadius: 10,
-    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#3A3A4A', // Default border color, same as background
+    marginBottom: 20, // Default margin bottom
+  },
+  emailInputError: {
+    borderColor: '#FF6347', // Red border color for error
+  },
+  errorMessage: {
+    color: '#FF6347', // Red text for error message
+    fontSize: 14,
+    marginTop: -15, // Move up to be closer to the input
+    marginBottom: 15, // Space after the error message
+    textAlign: 'left',
+    paddingLeft: 5,
   },
   continueButton: {
     backgroundColor: '#00BCD4',
     paddingVertical: 18,
     borderRadius: 10,
     alignItems: 'center',
-    marginBottom: 20,
+    // Adjust margin based on whether error message is present
+    marginTop: 0, // Ensure no extra space above if error is not present
+    marginBottom: 20, // Keep this consistent
   },
   continueButtonText: {
     color: '#1A1A2E',
