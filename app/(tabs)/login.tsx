@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'; // Import useEffect and useRef
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -14,15 +14,15 @@ import { useRouter } from 'expo-router';
 const LoginScreen = () => {
   const router = useRouter();
   const [email, setEmail] = useState('');
-  const [emailError, setEmailError] = useState(false); // State for email error
-  const errorTimerRef = useRef<NodeJS.Timeout | null>(null); // Ref to store the timer ID
+  const [emailError, setEmailError] = useState(false);
+  const errorTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleGoBack = () => {
     router.back();
   };
 
   const handleGoToRegister = () => {
-    router.push('/register');
+    router.push('/register'); // Navigate to the register screen
   };
 
   const handleContinue = () => {
@@ -32,41 +32,39 @@ const LoginScreen = () => {
     }
 
     if (email.trim() === '') {
-      setEmailError(true); // Set error state to true
+      setEmailError(true);
       // Set a timer to clear the error after 3 seconds
+      //@ts-expect-error
       errorTimerRef.current = setTimeout(() => {
         setEmailError(false);
-        errorTimerRef.current = null; // Clear the ref after timer fires
+        errorTimerRef.current = null;
       }, 3000); // 3000ms = 3 seconds
     } else {
       setEmailError(false); // Clear error state if input is valid
       console.log('Email entered:', email);
-      // In a real app, you would perform authentication or navigate
-      // router.push('/dashboard'); // Example navigation after successful input
+      // *** IMPORTANT CHANGE HERE ***
+      router.push('/home'); // Navigate to the Home screen (home.tsx)
     }
   };
 
-  // Function to handle text input changes and clear error immediately
-  // and clear any auto-dismiss timer if the user starts typing
   const handleEmailChange = (text: string) => {
     setEmail(text);
-    if (emailError) { // If there was an error showing
-      setEmailError(false); // Clear error immediately when user types
-      if (errorTimerRef.current) { // Clear the auto-dismiss timer
+    if (emailError) {
+      setEmailError(false);
+      if (errorTimerRef.current) {
         clearTimeout(errorTimerRef.current);
         errorTimerRef.current = null;
       }
     }
   };
 
-  // Clean up the timer when the component unmounts
   useEffect(() => {
     return () => {
       if (errorTimerRef.current) {
         clearTimeout(errorTimerRef.current);
       }
     };
-  }, []); // Empty dependency array means this runs once on mount and once on unmount
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -99,14 +97,14 @@ const LoginScreen = () => {
         <TextInput
           style={[
             styles.emailInput,
-            emailError && styles.emailInputError // Apply error style conditionally
+            emailError && styles.emailInputError
           ]}
           placeholder="Email"
           placeholderTextColor="#888"
           keyboardType="email-address"
           autoCapitalize="none"
           value={email}
-          onChangeText={handleEmailChange} // Use the new handler
+          onChangeText={handleEmailChange}
         />
         {/* Error message tooltip */}
         {emailError && (
@@ -168,7 +166,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#1A1A2E',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: 40,
+    paddingTop: 20,
   },
   backButton: {
     position: 'absolute',
@@ -225,17 +223,17 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#3A3A4A', // Default border color, same as background
-    marginBottom: 20, // Default margin bottom
+    borderColor: '#3A3A4A',
+    marginBottom: 20,
   },
   emailInputError: {
-    borderColor: '#FF6347', // Red border color for error
+    borderColor: '#FF6347',
   },
   errorMessage: {
-    color: '#FF6347', // Red text for error message
+    color: '#FF6347',
     fontSize: 14,
-    marginTop: -15, // Move up to be closer to the input
-    marginBottom: 15, // Space after the error message
+    marginTop: -15,
+    marginBottom: 15,
     textAlign: 'left',
     paddingLeft: 5,
   },
@@ -244,9 +242,8 @@ const styles = StyleSheet.create({
     paddingVertical: 18,
     borderRadius: 10,
     alignItems: 'center',
-    // Adjust margin based on whether error message is present
-    marginTop: 0, // Ensure no extra space above if error is not present
-    marginBottom: 20, // Keep this consistent
+    marginTop: 0,
+    marginBottom: 20,
   },
   continueButtonText: {
     color: '#1A1A2E',
