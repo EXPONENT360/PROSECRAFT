@@ -16,7 +16,7 @@ import { useTheme } from '../../hooks/useTheme';
 
 const FeedbackScreen = () => {
   const router = useRouter();
-  const { colors, spacing, fontSize } = useTheme();
+  const { colors, spacing, fontSizeValues } = useTheme();
   const [feedback, setFeedback] = useState('');
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -50,7 +50,7 @@ const FeedbackScreen = () => {
         <TouchableOpacity onPress={handleGoBack} style={styles.backButton}>
           <ArrowLeft size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: colors.text, fontSize: fontSize.large }]}>Share Feedback</Text>
+        <Text style={[styles.headerTitle, { color: colors.text, fontSize: fontSizeValues.large }]}>Share Feedback</Text>
         <View style={styles.headerRight} />
       </View>
 
@@ -61,22 +61,22 @@ const FeedbackScreen = () => {
           <View style={[styles.welcomeIcon, { backgroundColor: colors.primary }]}>
             <MessageSquare size={32} color={colors.background} />
           </View>
-          <Text style={[styles.welcomeTitle, { color: colors.text, fontSize: fontSize.xlarge }]}>
+          <Text style={[styles.welcomeTitle, { color: colors.text, fontSize: fontSizeValues.large }]}>
             Share Your Feedback
           </Text>
-          <Text style={[styles.welcomeSubtitle, { color: colors.textSecondary, fontSize: fontSize.medium }]}>
+          <Text style={[styles.welcomeSubtitle, { color: colors.textSecondary, fontSize: fontSizeValues.medium }]}>
             Help us improve Prosecraft by sharing your thoughts and suggestions
           </Text>
         </View>
 
         {/* Feedback Form */}
         <View style={[styles.formSection, { paddingHorizontal: spacing.lg }]}>
-          <Text style={[styles.formLabel, { color: colors.text, fontSize: fontSize.medium }]}>
+          <Text style={[styles.formLabel, { color: colors.text, fontSize: fontSizeValues.medium }]}>
             Your Feedback
           </Text>
           <View style={[styles.textInputContainer, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <TextInput
-              style={[styles.textInput, { color: colors.text, fontSize: fontSize.medium }]}
+              style={[styles.textInput, { color: colors.text, fontSize: fontSizeValues.medium }]}
               placeholder="Tell us what you think about Prosecraft..."
               placeholderTextColor={colors.textSecondary}
               value={feedback}
@@ -87,12 +87,12 @@ const FeedbackScreen = () => {
             />
           </View>
 
-          <Text style={[styles.formLabel, { color: colors.text, fontSize: fontSize.medium }]}>
+          <Text style={[styles.formLabel, { color: colors.text, fontSize: fontSizeValues.medium }]}>
             Email (Optional)
           </Text>
           <View style={[styles.textInputContainer, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <TextInput
-              style={[styles.textInput, { color: colors.text, fontSize: fontSize.medium }]}
+              style={[styles.textInput, { color: colors.text, fontSize: fontSizeValues.medium }]}
               placeholder="your.email@example.com"
               placeholderTextColor={colors.textSecondary}
               value={email}
@@ -118,7 +118,7 @@ const FeedbackScreen = () => {
             disabled={isSubmitting}
           >
             <Send size={20} color={colors.background} style={styles.submitIcon} />
-            <Text style={[styles.submitText, { color: colors.background, fontSize: fontSize.medium }]}>
+            <Text style={[styles.submitText, { color: colors.background, fontSize: fontSizeValues.medium }]}>
               {isSubmitting ? 'Submitting...' : 'Submit Feedback'}
             </Text>
           </TouchableOpacity>
@@ -126,7 +126,7 @@ const FeedbackScreen = () => {
 
         {/* Info Section */}
         <View style={[styles.infoSection, { paddingHorizontal: spacing.lg }]}>
-          <Text style={[styles.infoText, { color: colors.textSecondary, fontSize: fontSize.small }]}>
+          <Text style={[styles.infoText, { color: colors.textSecondary, fontSize: fontSizeValues.small }]}>
             Your feedback helps us improve Prosecraft for everyone. We read every submission and will get back to you if needed.
           </Text>
         </View>

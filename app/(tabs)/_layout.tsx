@@ -26,7 +26,7 @@ export default function TabLayout() {
           justifyContent: 'center',
           alignItems: 'center',
           paddingVertical: 12,
-          minWidth: 0,
+          minWidth: 60,
         },
         tabBarLabelStyle: {
           fontSize: 13,
@@ -107,15 +107,26 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="feedback"
-        options={{ title: 'Feedback' }}
+        options={{ 
+          title: 'Feedback',
+          tabBarStyle: { display: 'none'},
+          tabBarButton: () => null,
+        }}
       />
       <Tabs.Screen
         name="privacyPolicy"
-        options={{ title: 'Privacy Policy' }}
+        options={{ 
+          title: 'Privacy Policy', 
+          tabBarStyle: { display: 'none'},
+          tabBarButton: () => null, 
+        }}
       />
       <Tabs.Screen
         name="support"
-        options={{ title: 'Support' }}
+        options={{ title: 'Support', 
+          tabBarStyle: { display: 'none'},
+          tabBarButton: () => null, 
+        }}
       />
     </Tabs>
   );

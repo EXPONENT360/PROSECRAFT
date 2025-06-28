@@ -30,7 +30,7 @@ interface ThemeContextType {
     lg: number;
     xl: number;
   };
-  fontSize: {
+  fontSizeValues: {
     small: number;
     medium: number;
     large: number;
@@ -161,7 +161,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     setLayoutDensity,
     colors,
     spacing,
-    fontSize: fontSizeValues,
+    fontSizeValues,
   };
 
   return React.createElement(ThemeContext.Provider, { value }, children);

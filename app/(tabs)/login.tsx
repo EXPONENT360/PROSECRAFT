@@ -19,7 +19,7 @@ import { useTheme } from '../../hooks/useTheme';
 
 const LoginScreen = () => {
   const router = useRouter();
-  const { colors, spacing, fontSize } = useTheme();
+  const { colors, spacing, fontSizeValues } = useTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);

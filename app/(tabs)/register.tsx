@@ -1,20 +1,20 @@
+import { useRouter } from 'expo-router';
+import { ArrowLeft, CheckCircle, Eye, EyeOff, Mail, User } from 'lucide-react-native';
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  StatusBar,
-  TouchableOpacity,
-  TextInput,
+  Alert,
+  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Alert,
-  Image,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
-import { ArrowLeft, Eye, EyeOff, Mail, User, CheckCircle, ChevronRight } from 'lucide-react-native';
 import { useTheme } from '../../hooks/useTheme';
 
 const RegisterScreen = () => {
@@ -216,75 +216,84 @@ const RegisterScreen = () => {
                   )}
                 </TouchableOpacity>
               </View>
-              {confirmPassword.length > 0 && (
-                <Text style={[
-                  styles.passwordHint,
-                  password === confirmPassword ? styles.passwordHintValid : styles.passwordHintInvalid
-                ]}>
-                  {password === confirmPassword ? '✓ Passwords match' : 'Passwords do not match'}
+              {confirmPassword.length > 0 && password !== confirmPassword && (
+                <Text style={[styles.passwordHint, styles.passwordHintInvalid]}>
+                  Passwords do not match
                 </Text>
               )}
             </View>
 
             {/* Terms Agreement */}
-            <TouchableOpacity 
-              style={styles.termsContainer}
-              onPress={() => setAgreedToTerms(!agreedToTerms)}
-            >
-              <View style={[styles.checkbox, agreedToTerms && styles.checkboxChecked]}>
-                {agreedToTerms && <CheckCircle size={16} color={colors.background} />}
-              </View>
-              <Text style={[styles.termsText, { color: colors.textSecondary }]}>
-                I agree to the{' '}
-                <Text style={[styles.termsLink, { color: colors.primary }]}>Terms of Service</Text>
-                {' '}and{' '}
-                <Text style={[styles.termsLink, { color: colors.primary }]}>Privacy Policy</Text>
-              </Text>
-            </TouchableOpacity>
+            <View style={styles.termsContainer}>
+              <TouchableOpacity 
+                style={styles.checkboxContainer}
+                onPress={() => setAgreedToTerms(!agreedToTerms)}
+              >
+                <View style={[
+                  styles.checkbox,
+                  agreedToTerms && { backgroundColor: colors.primary, borderColor: colors.primary }
+                ]}>
+                  {agreedToTerms && <CheckCircle size={16} color="#FFFFFF" />}
+                </View>
+                <Text style={[styles.termsText, { color: colors.textSecondary }]}>
+                  I agree to the{' '}
+                  <Text style={[styles.termsLink, { color: colors.primary }]}>Terms of Service</Text>
+                  {' '}and{' '}
+                  <Text style={[styles.termsLink, { color: colors.primary }]}>Privacy Policy</Text>
+                </Text>
+              </TouchableOpacity>
+            </View>
 
             {/* Sign Up Button */}
-            <TouchableOpacity 
-              style={[styles.signUpButton, { backgroundColor: colors.primary }, isLoading && styles.signUpButtonDisabled]}
+            <TouchableOpacity
+              style={[
+                styles.signUpButton,
+                { backgroundColor: colors.primary },
+                isLoading && styles.signUpButtonDisabled
+              ]}
               onPress={handleSignUp}
               disabled={isLoading}
             >
-              <Text style={[styles.signUpButtonText, { color: colors.background }]}>
-                {isLoading ? 'Creating account...' : 'Create Account'}
+              <Text style={styles.signUpButtonText}>
+                {isLoading ? 'Creating account...' : 'Create account'}
               </Text>
             </TouchableOpacity>
 
             {/* Divider */}
-            <View style={styles.divider}>
-              <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
+            <View style={styles.dividerContainer}>
+              <View style={[styles.divider, { backgroundColor: colors.border }]} />
               <Text style={[styles.dividerText, { color: colors.textSecondary }]}>or continue with</Text>
-              <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
+              <View style={[styles.divider, { backgroundColor: colors.border }]} />
             </View>
 
-            {/* Social Sign-up Options */}
+            {/* Social Sign Up */}
             <View style={styles.socialContainer}>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={[styles.socialButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
                 onPress={() => handleSocialSignUp('Google')}
               >
                 <Text style={[styles.socialButtonText, { color: colors.text }]}>Google</Text>
-                <ChevronRight size={16} color={colors.textSecondary} />
               </TouchableOpacity>
-
-              <TouchableOpacity 
+              
+              <TouchableOpacity
                 style={[styles.socialButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
                 onPress={() => handleSocialSignUp('Apple')}
               >
                 <Text style={[styles.socialButtonText, { color: colors.text }]}>Apple</Text>
-                <ChevronRight size={16} color={colors.textSecondary} />
               </TouchableOpacity>
             </View>
 
-            {/* Sign In Link */}
-            <View style={styles.signInContainer}>
-              <Text style={[styles.signInText, { color: colors.textSecondary }]}>Already have an account? </Text>
-              <TouchableOpacity onPress={handleGoBack}>
-                <Text style={[styles.signInLink, { color: colors.primary }]}>Sign in</Text>
-              </TouchableOpacity>
+            {/* Login Link */}
+            <View style={styles.loginContainer}>
+              <Text style={[styles.loginText, { color: colors.textSecondary }]}>
+                Already have an account?{' '}
+                <Text 
+                  style={[styles.loginLink, { color: colors.primary }]}
+                  onPress={() => router.push('/login')}
+                >
+                  Sign in
+                </Text>
+              </Text>
             </View>
           </View>
         </ScrollView>
@@ -293,31 +302,31 @@ const RegisterScreen = () => {
   );
 };
 
-export default RegisterScreen;
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  keyboardView: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    paddingHorizontal: 24,
-  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
+    paddingHorizontal: 20,
     paddingVertical: 16,
     borderBottomWidth: 1,
   },
   backButton: {
     padding: 8,
   },
+  keyboardView: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingHorizontal: 20,
+    paddingBottom: 40,
+  },
   logoSection: {
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 40,
     marginBottom: 40,
   },
   logo: {
@@ -326,9 +335,8 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   appName: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
-    letterSpacing: 1,
   },
   formContainer: {
     flex: 1,
@@ -337,13 +345,12 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   formTitle: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 8,
   },
   formSubtitle: {
     fontSize: 16,
-    lineHeight: 24,
   },
   inputContainer: {
     marginBottom: 20,
@@ -351,10 +358,10 @@ const styles = StyleSheet.create({
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
+    borderWidth: 1,
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 16,
-    borderWidth: 1,
   },
   inputIcon: {
     marginRight: 12,
@@ -362,10 +369,9 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 16,
-    paddingVertical: 0,
   },
   passwordInput: {
-    paddingRight: 40,
+    paddingRight: 50,
   },
   eyeIcon: {
     position: 'absolute',
@@ -378,29 +384,28 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   passwordHintValid: {
-    color: '#4CAF50',
+    color: '#10B981',
   },
   passwordHintInvalid: {
-    color: '#FF6B6B',
+    color: '#EF4444',
   },
   termsContainer: {
+    marginBottom: 24,
+  },
+  checkboxContainer: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: 24,
   },
   checkbox: {
     width: 20,
     height: 20,
     borderRadius: 4,
     borderWidth: 2,
+    borderColor: '#D1D5DB',
     marginRight: 12,
     marginTop: 2,
-    justifyContent: 'center',
     alignItems: 'center',
-  },
-  checkboxChecked: {
-    backgroundColor: '#00BCD4',
-    borderColor: '#00BCD4',
+    justifyContent: 'center',
   },
   termsText: {
     flex: 1,
@@ -408,70 +413,60 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   termsLink: {
-    fontWeight: '500',
+    fontWeight: '600',
   },
   signUpButton: {
-    borderRadius: 12,
     paddingVertical: 16,
+    borderRadius: 12,
     alignItems: 'center',
     marginBottom: 24,
-    shadowColor: '#00BCD4',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
   },
   signUpButtonDisabled: {
-    opacity: 0.7,
+    opacity: 0.6,
   },
   signUpButtonText: {
+    color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '600',
   },
-  divider: {
+  dividerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 24,
   },
-  dividerLine: {
+  divider: {
     flex: 1,
     height: 1,
   },
   dividerText: {
-    fontSize: 14,
     marginHorizontal: 16,
+    fontSize: 14,
   },
   socialContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    gap: 12,
     marginBottom: 32,
   },
   socialButton: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderRadius: 12,
     paddingVertical: 16,
-    paddingHorizontal: 20,
-    marginHorizontal: 4,
+    borderRadius: 12,
     borderWidth: 1,
+    alignItems: 'center',
   },
   socialButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 16,
+    fontWeight: '500',
   },
-  signInContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+  loginContainer: {
     alignItems: 'center',
-    marginBottom: 20,
   },
-  signInText: {
+  loginText: {
     fontSize: 14,
   },
-  signInLink: {
-    fontSize: 14,
+  loginLink: {
     fontWeight: '600',
   },
 });
+
+export default RegisterScreen;

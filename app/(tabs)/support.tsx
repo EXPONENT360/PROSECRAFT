@@ -1,28 +1,28 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  StatusBar,
-  TouchableOpacity,
-  ScrollView,
-  Alert,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import {
-  ArrowLeft,
-  MessageSquare,
-  Mail,
-  Phone,
-  HelpCircle,
-  ChevronRight,
+    ArrowLeft,
+    ChevronRight,
+    HelpCircle,
+    Mail,
+    MessageSquare,
+    Phone,
 } from 'lucide-react-native';
+import React, { useState } from 'react';
+import {
+    Alert,
+    ScrollView,
+    StatusBar,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../hooks/useTheme';
 
 const SupportScreen = () => {
   const router = useRouter();
-  const { colors, spacing, fontSize } = useTheme();
+  const { colors, spacing, fontSizeValues } = useTheme();
   const [expandedFAQ, setExpandedFAQ] = useState<string | null>(null);
 
   const handleGoBack = () => {
@@ -74,7 +74,7 @@ const SupportScreen = () => {
         <TouchableOpacity onPress={handleGoBack} style={styles.backButton}>
           <ArrowLeft size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: colors.text, fontSize: fontSize.large }]}>Help & Support</Text>
+        <Text style={[styles.headerTitle, { color: colors.text, fontSize: fontSizeValues.large }]}>Help & Support</Text>
         <View style={styles.headerRight} />
       </View>
 
@@ -82,17 +82,17 @@ const SupportScreen = () => {
         
         {/* Welcome Section */}
         <View style={[styles.welcomeSection, { paddingHorizontal: spacing.lg }]}>
-          <Text style={[styles.welcomeTitle, { color: colors.text, fontSize: fontSize.xlarge }]}>
+          <Text style={[styles.welcomeTitle, { color: colors.text, fontSize: fontSizeValues.large }]}>
             Need Help?
           </Text>
-          <Text style={[styles.welcomeSubtitle, { color: colors.textSecondary, fontSize: fontSize.medium }]}>
+          <Text style={[styles.welcomeSubtitle, { color: colors.textSecondary, fontSize: fontSizeValues.medium }]}>
             Get in touch with our support team or find answers to common questions
           </Text>
         </View>
 
         {/* Contact Options */}
         <View style={[styles.contactSection, { paddingHorizontal: spacing.lg }]}>
-          <Text style={[styles.sectionTitle, { color: colors.textSecondary, fontSize: fontSize.small }]}>
+          <Text style={[styles.sectionTitle, { color: colors.textSecondary, fontSize: fontSizeValues.small }]}>
             Contact Support
           </Text>
           
@@ -102,10 +102,10 @@ const SupportScreen = () => {
           >
             <Mail size={24} color={colors.primary} />
             <View style={styles.contactInfo}>
-              <Text style={[styles.contactTitle, { color: colors.text, fontSize: fontSize.medium }]}>
+              <Text style={[styles.contactTitle, { color: colors.text, fontSize: fontSizeValues.medium }]}>
                 Email Support
               </Text>
-              <Text style={[styles.contactDescription, { color: colors.textSecondary, fontSize: fontSize.small }]}>
+              <Text style={[styles.contactDescription, { color: colors.textSecondary, fontSize: fontSizeValues.small }]}>
                 Get help via email
               </Text>
             </View>
@@ -118,10 +118,10 @@ const SupportScreen = () => {
           >
             <MessageSquare size={24} color={colors.primary} />
             <View style={styles.contactInfo}>
-              <Text style={[styles.contactTitle, { color: colors.text, fontSize: fontSize.medium }]}>
+              <Text style={[styles.contactTitle, { color: colors.text, fontSize: fontSizeValues.medium }]}>
                 Live Chat
               </Text>
-              <Text style={[styles.contactDescription, { color: colors.textSecondary, fontSize: fontSize.small }]}>
+              <Text style={[styles.contactDescription, { color: colors.textSecondary, fontSize: fontSizeValues.small }]}>
                 Chat with our team
               </Text>
             </View>
@@ -134,10 +134,10 @@ const SupportScreen = () => {
           >
             <Phone size={24} color={colors.primary} />
             <View style={styles.contactInfo}>
-              <Text style={[styles.contactTitle, { color: colors.text, fontSize: fontSize.medium }]}>
+              <Text style={[styles.contactTitle, { color: colors.text, fontSize: fontSizeValues.medium }]}>
                 Phone Support
               </Text>
-              <Text style={[styles.contactDescription, { color: colors.textSecondary, fontSize: fontSize.small }]}>
+              <Text style={[styles.contactDescription, { color: colors.textSecondary, fontSize: fontSizeValues.small }]}>
                 Call us directly
               </Text>
             </View>
@@ -147,7 +147,7 @@ const SupportScreen = () => {
 
         {/* FAQ Section */}
         <View style={[styles.faqSection, { paddingHorizontal: spacing.lg }]}>
-          <Text style={[styles.sectionTitle, { color: colors.textSecondary, fontSize: fontSize.small }]}>
+          <Text style={[styles.sectionTitle, { color: colors.textSecondary, fontSize: fontSizeValues.small }]}>
             Frequently Asked Questions
           </Text>
           
@@ -159,7 +159,7 @@ const SupportScreen = () => {
             >
               <View style={styles.faqHeader}>
                 <HelpCircle size={20} color={colors.primary} />
-                <Text style={[styles.faqQuestion, { color: colors.text, fontSize: fontSize.medium }]}>
+                <Text style={[styles.faqQuestion, { color: colors.text, fontSize: fontSizeValues.medium }]}>
                   {faq.question}
                 </Text>
                 <ChevronRight 
@@ -173,7 +173,7 @@ const SupportScreen = () => {
               </View>
               
               {expandedFAQ === faq.id && (
-                <Text style={[styles.faqAnswer, { color: colors.textSecondary, fontSize: fontSize.small }]}>
+                <Text style={[styles.faqAnswer, { color: colors.textSecondary, fontSize: fontSizeValues.small }]}>
                   {faq.answer}
                 </Text>
               )}
@@ -183,7 +183,7 @@ const SupportScreen = () => {
 
         {/* Info Section */}
         <View style={[styles.infoSection, { paddingHorizontal: spacing.lg }]}>
-          <Text style={[styles.infoText, { color: colors.textSecondary, fontSize: fontSize.small }]}>
+          <Text style={[styles.infoText, { color: colors.textSecondary, fontSize: fontSizeValues.small }]}>
             Our support team is available 24/7 to help you with any questions or issues you may have.
           </Text>
         </View>
