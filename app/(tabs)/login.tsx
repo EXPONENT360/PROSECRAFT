@@ -1,160 +1,207 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
-  TextInput,
-  TouchableOpacity,
   StyleSheet,
   StatusBar,
+  TouchableOpacity,
+  TextInput,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Alert,
   Image,
 } from 'react-native';
-import { ChevronRight, Sparkles, ArrowLeft } from 'lucide-react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { ArrowLeft, Eye, EyeOff, Mail, ChevronRight } from 'lucide-react-native';
+import { useTheme } from '../../hooks/useTheme';
 
 const LoginScreen = () => {
   const router = useRouter();
+  const { colors, spacing, fontSize } = useTheme();
   const [email, setEmail] = useState('');
-  const [emailError, setEmailError] = useState(false);
-  const errorTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleGoBack = () => {
     router.back();
   };
 
   const handleGoToRegister = () => {
-    router.push('/register'); // Navigate to the register screen
+    router.push('/register');
   };
 
-  const handleContinue = () => {
-    // Clear any existing timer when attempting to continue
-    if (errorTimerRef.current) {
-      clearTimeout(errorTimerRef.current);
-    }
-
-    if (email.trim() === '') {
-      setEmailError(true);
-      // Set a timer to clear the error after 3 seconds
-      //@ts-expect-error
-      errorTimerRef.current = setTimeout(() => {
-        setEmailError(false);
-        errorTimerRef.current = null;
-      }, 3000); // 3000ms = 3 seconds
-    } else {
-      setEmailError(false); // Clear error state if input is valid
-      console.log('Email entered:', email);
-      // *** IMPORTANT CHANGE HERE ***
-      router.push('/home'); // Navigate to the Home screen (home.tsx)
-    }
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
   };
 
-  const handleEmailChange = (text: string) => {
-    setEmail(text);
-    if (emailError) {
-      setEmailError(false);
-      if (errorTimerRef.current) {
-        clearTimeout(errorTimerRef.current);
-        errorTimerRef.current = null;
-      }
+  const handleSignIn = async () => {
+    if (!email.trim()) {
+      Alert.alert('Error', 'Please enter your email address');
+      return;
     }
+
+    if (!validateEmail(email)) {
+      Alert.alert('Error', 'Please enter a valid email address');
+      return;
+    }
+
+    if (!password.trim()) {
+      Alert.alert('Error', 'Please enter your password');
+      return;
+    }
+
+    setIsLoading(true);
+    
+    // Simulate API call
+    setTimeout(() => {
+      setIsLoading(false);
+      router.push('/home');
+    }, 1500);
   };
 
-  useEffect(() => {
-    return () => {
-      if (errorTimerRef.current) {
-        clearTimeout(errorTimerRef.current);
-      }
-    };
-  }, []);
+  const handleSocialSignIn = (provider: string) => {
+    Alert.alert('Coming Soon', `${provider} sign-in will be available soon!`);
+  };
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#1A1A2E" />
-
-      {/* Back Button */}
-      <TouchableOpacity style={styles.backButton} onPress={handleGoBack}>
-        <ArrowLeft size={28} color="#FFF" />
-      </TouchableOpacity>
-
-      {/* Header Section with Logo and App Name */}
-      <View style={styles.headerSection}>
-        <Image
-          source={require('../assets/images/prosecraft1-logo.png')}
-          style={styles.logoImage}
-        />
-      </View>
-
-      {/* Login Card */}
-      <View style={styles.loginCard}>
-        {/* Sign In Header */}
-        <View style={styles.signInHeader}>
-          <Text style={styles.signInText}>Sign in</Text>
-          <TouchableOpacity onPress={handleGoToRegister}>
-            <Text style={styles.dontHaveAccountText}>I don't have an account</Text>
+    <KeyboardAvoidingView
+      style={[styles.container, { backgroundColor: colors.background }]}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 24}
+    >
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+        <StatusBar barStyle="light-content" backgroundColor={colors.background} />
+        
+        {/* Fixed Header */}
+        <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+          <TouchableOpacity style={styles.backButton} onPress={handleGoBack}>
+            <ArrowLeft size={24} color={colors.text} />
           </TouchableOpacity>
         </View>
 
-        {/* Email Input */}
-        <TextInput
-          style={[
-            styles.emailInput,
-            emailError && styles.emailInputError
-          ]}
-          placeholder="Email"
-          placeholderTextColor="#888"
-          keyboardType="email-address"
-          autoCapitalize="none"
-          value={email}
-          onChangeText={handleEmailChange}
-        />
-        {/* Error message tooltip */}
-        {emailError && (
-          <Text style={styles.errorMessage}>Email field must not be empty.</Text>
-        )}
-
-        {/* Continue Button */}
-        <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
-          <Text style={styles.continueButtonText}>Continue</Text>
-        </TouchableOpacity>
-
-        {/* Can't Sign In Link */}
-        <TouchableOpacity style={styles.cantSignInButton}>
-          <Text style={styles.cantSignInText}>Can't sign in?</Text>
-        </TouchableOpacity>
-
-        {/* Social Sign-in Options */}
-        <View style={styles.socialLoginContainer}>
-          {/* Google Sign-in */}
-          <TouchableOpacity style={styles.socialButton}>
+        <ScrollView 
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          
+          {/* Logo Section */}
+          <View style={styles.logoSection}>
             <Image
-              source={{ uri: 'https://img.icons8.com/color/48/google-logo.png' }}
-              style={styles.socialIcon}
+              source={require('../assets/images/prosecraft1-logo.png')}
+              style={styles.logo}
+              resizeMode="contain"
             />
-            <Text style={styles.socialButtonText}>Sign in with Google</Text>
-            <ChevronRight size={24} color="#888" />
-          </TouchableOpacity>
+            <Text style={[styles.appName, { color: colors.text }]}>Prosecraft</Text>
+          </View>
 
-          {/* Facebook Sign-in */}
-          <TouchableOpacity style={styles.socialButton}>
-            <Image
-              source={{ uri: 'https://img.icons8.com/color/48/facebook-new.png' }}
-              style={styles.socialIcon}
-            />
-            <Text style={styles.socialButtonText}>Sign in with Facebook</Text>
-            <ChevronRight size={24} color="#888" />
-          </TouchableOpacity>
+          {/* Login Form */}
+          <View style={styles.formContainer}>
+            <View style={styles.formHeader}>
+              <Text style={[styles.formTitle, { color: colors.text }]}>Welcome back</Text>
+              <Text style={[styles.formSubtitle, { color: colors.textSecondary }]}>Sign in to your account</Text>
+            </View>
 
-          {/* Apple Sign-in */}
-          <TouchableOpacity style={styles.socialButton}>
-            <Image
-              source={{ uri: 'https://img.icons8.com/ios-filled/50/mac-os.png' }}
-              style={styles.socialIcon}
-            />
-            <Text style={styles.socialButtonText}>Sign in with Apple</Text>
-            <ChevronRight size={24} color="#888" />
-          </TouchableOpacity>
-        </View>
-      </View>
-    </View>
+            {/* Email Input */}
+            <View style={styles.inputContainer}>
+              <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                <Mail size={20} color={colors.textSecondary} style={styles.inputIcon} />
+                <TextInput
+                  style={[styles.input, { color: colors.text }]}
+                  placeholder="Email address"
+                  placeholderTextColor={colors.textSecondary}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  value={email}
+                  onChangeText={setEmail}
+                />
+              </View>
+            </View>
+
+            {/* Password Input */}
+            <View style={styles.inputContainer}>
+              <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                <TextInput
+                  style={[styles.input, styles.passwordInput, { color: colors.text }]}
+                  placeholder="Password"
+                  placeholderTextColor={colors.textSecondary}
+                  secureTextEntry={!showPassword}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  value={password}
+                  onChangeText={setPassword}
+                />
+                <TouchableOpacity 
+                  style={styles.eyeIcon}
+                  onPress={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <EyeOff size={20} color={colors.textSecondary} />
+                  ) : (
+                    <Eye size={20} color={colors.textSecondary} />
+                  )}
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Forgot Password */}
+            <TouchableOpacity style={styles.forgotPassword}>
+              <Text style={[styles.forgotPasswordText, { color: colors.primary }]}>Forgot password?</Text>
+            </TouchableOpacity>
+
+            {/* Sign In Button */}
+            <TouchableOpacity 
+              style={[styles.signInButton, { backgroundColor: colors.primary }, isLoading && styles.signInButtonDisabled]}
+              onPress={handleSignIn}
+              disabled={isLoading}
+            >
+              <Text style={[styles.signInButtonText, { color: colors.background }]}>
+                {isLoading ? 'Signing in...' : 'Sign In'}
+              </Text>
+            </TouchableOpacity>
+
+            {/* Divider */}
+            <View style={styles.divider}>
+              <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
+              <Text style={[styles.dividerText, { color: colors.textSecondary }]}>or continue with</Text>
+              <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
+            </View>
+
+            {/* Social Sign-in Options */}
+            <View style={styles.socialContainer}>
+              <TouchableOpacity 
+                style={[styles.socialButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
+                onPress={() => handleSocialSignIn('Google')}
+              >
+                <Text style={[styles.socialButtonText, { color: colors.text }]}>Google</Text>
+                <ChevronRight size={16} color={colors.textSecondary} />
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={[styles.socialButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
+                onPress={() => handleSocialSignIn('Apple')}
+              >
+                <Text style={[styles.socialButtonText, { color: colors.text }]}>Apple</Text>
+                <ChevronRight size={16} color={colors.textSecondary} />
+              </TouchableOpacity>
+            </View>
+
+            {/* Sign Up Link */}
+            <View style={styles.signUpContainer}>
+              <Text style={[styles.signUpText, { color: colors.textSecondary }]}>Don't have an account? </Text>
+              <TouchableOpacity onPress={handleGoToRegister}>
+                <Text style={[styles.signUpLink, { color: colors.primary }]}>Sign up</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -163,123 +210,147 @@ export default LoginScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1A1A2E',
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingHorizontal: 24,
+  },
+  header: {
+    flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
   },
   backButton: {
-    position: 'absolute',
-    top: 40,
-    left: 20,
-    zIndex: 10,
-    padding: 10,
+    padding: 8,
   },
-  headerSection: {
+  logoSection: {
     alignItems: 'center',
+    marginTop: 20,
     marginBottom: 40,
   },
-  logoIcon: {
-    marginBottom: 10,
-  },
-  logoImage: {
-    width: 170,
-    height: 170,
-    resizeMode: 'contain',
-    marginBottom: 10,
+  logo: {
+    width: 80,
+    height: 80,
+    marginBottom: 16,
   },
   appName: {
-    color: '#FFF',
     fontSize: 24,
     fontWeight: 'bold',
+    letterSpacing: 1,
   },
-  loginCard: {
-    backgroundColor: '#2B2B3A',
-    borderRadius: 15,
-    padding: 20,
-    width: '100%',
-    maxWidth: 400,
+  formContainer: {
+    flex: 1,
   },
-  signInHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
-    marginBottom: 30,
+  formHeader: {
+    marginBottom: 32,
   },
-  signInText: {
-    color: '#FFF',
+  formTitle: {
     fontSize: 28,
     fontWeight: 'bold',
+    marginBottom: 8,
   },
-  dontHaveAccountText: {
-    color: '#00BCD4',
+  formSubtitle: {
     fontSize: 16,
-    textDecorationLine: 'underline',
+    lineHeight: 24,
   },
-  emailInput: {
-    backgroundColor: '#3A3A4A',
-    color: '#FFF',
-    fontSize: 18,
-    padding: 15,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#3A3A4A',
+  inputContainer: {
     marginBottom: 20,
   },
-  emailInputError: {
-    borderColor: '#FF6347',
-  },
-  errorMessage: {
-    color: '#FF6347',
-    fontSize: 14,
-    marginTop: -15,
-    marginBottom: 15,
-    textAlign: 'left',
-    paddingLeft: 5,
-  },
-  continueButton: {
-    backgroundColor: '#00BCD4',
-    paddingVertical: 18,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginTop: 0,
-    marginBottom: 20,
-  },
-  continueButtonText: {
-    color: '#1A1A2E',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  cantSignInButton: {
-    alignSelf: 'center',
-    marginBottom: 30,
-  },
-  cantSignInText: {
-    color: '#00BCD4',
-    fontSize: 16,
-    textDecorationLine: 'underline',
-  },
-  socialLoginContainer: {
-    width: '100%',
-  },
-  socialButton: {
+  inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#3A3A4A',
-    paddingVertical: 15,
-    paddingHorizontal: 15,
-    borderRadius: 10,
-    marginBottom: 15,
-    justifyContent: 'space-between',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    borderWidth: 1,
   },
-  socialIcon: {
-    width: 24,
-    height: 24,
-    marginRight: 15,
+  inputIcon: {
+    marginRight: 12,
+  },
+  input: {
+    flex: 1,
+    fontSize: 16,
+    paddingVertical: 0,
+  },
+  passwordInput: {
+    paddingRight: 40,
+  },
+  eyeIcon: {
+    position: 'absolute',
+    right: 16,
+    padding: 4,
+  },
+  forgotPassword: {
+    alignSelf: 'flex-end',
+    marginBottom: 24,
+  },
+  forgotPasswordText: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  signInButton: {
+    borderRadius: 12,
+    paddingVertical: 16,
+    alignItems: 'center',
+    marginBottom: 24,
+    shadowColor: '#00BCD4',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  signInButtonDisabled: {
+    opacity: 0.7,
+  },
+  signInButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+  },
+  dividerText: {
+    fontSize: 14,
+    marginHorizontal: 16,
+  },
+  socialContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 32,
+  },
+  socialButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderRadius: 12,
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    marginHorizontal: 4,
+    borderWidth: 1,
   },
   socialButtonText: {
-    color: '#FFF',
-    fontSize: 18,
-    flex: 1,
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  signUpContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  signUpText: {
+    fontSize: 14,
+  },
+  signUpLink: {
+    fontSize: 14,
+    fontWeight: '600',
   },
 });

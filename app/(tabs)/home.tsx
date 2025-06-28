@@ -1,130 +1,319 @@
-import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  StatusBar,
-  TouchableOpacity,
-  TextInput,
-  ScrollView,
-  Image,
-} from 'react-native';
-import {
-  Settings,
-  LayoutGrid,
-  SquareSlash,
-  MessageSquare,
-  FileText,
-  LifeBuoy,
-  Edit3,
-  Info,
-} from 'lucide-react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import {
+    Bell,
+    Edit3,
+    FileText,
+    Info,
+    LayoutGrid,
+    LifeBuoy,
+    MessageSquare,
+    Send,
+    Settings,
+    Sparkles,
+    SquareSlash,
+    User,
+} from 'lucide-react-native';
+import React, { useState } from 'react';
+import {
+    Alert,
+    Dimensions,
+    Image,
+    ScrollView,
+    StatusBar,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTheme } from '../../hooks/useTheme';
+
+const { width } = Dimensions.get('window');
 
 const HomeScreen = () => {
   const router = useRouter();
+  const { colors, spacing, fontSize } = useTheme();
+  const [draftText, setDraftText] = useState('');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
-  // Placeholder functions for navigation/actions
-  const handleSettingsPress = () => {
-    // console.log('Navigate to Settings');
-    router.push('/settings');
+  const handleNavigation = (screen: string) => {
+    switch (screen) {
+      case 'settings':
+        router.push('/settings');
+        break;
+      case 'appearance':
+        router.push('/appearance');
+        break;
+      case 'blockedApps':
+        router.push('/blockedApps');
+        break;
+      case 'feedback':
+        router.push('/feedback');
+        break;
+      case 'privacyPolicy':
+        router.push('/privacyPolicy');
+        break;
+      case 'support':
+        router.push('/support');
+        break;
+      default:
+        Alert.alert('Coming Soon', 'This feature will be available soon!');
+    }
   };
 
-  const handleAppearancePress = () => {
-    console.log('Navigate to Appearance');
-    // router.push('/appearance');
+  const handleAnalyzeText = () => {
+    if (!draftText.trim()) {
+      Alert.alert('No Text', 'Please enter some text to analyze');
+      return;
+    }
+
+    setIsAnalyzing(true);
+    setTimeout(() => {
+      setIsAnalyzing(false);
+      Alert.alert('Analysis Complete', 'Your text has been analyzed successfully!');
+    }, 2000);
   };
 
-  const handleBlockedAppsPress = () => {
-    console.log('Navigate to Blocked Apps');
-    // router.push('/blocked-apps');
-  };
+  const handleQuickAction = (action: string) => {
+    if (!draftText.trim()) {
+      Alert.alert('No Text', 'Please enter some text in the draft area first');
+      return;
+    }
 
-  const handleShareFeedbackPress = () => {
-    console.log('Open feedback form');
-  };
-
-  const handlePrivacyPolicyPress = () => {
-    console.log('Open Privacy Policy');
-  };
-
-  const handleSupportPress = () => {
-    console.log('Open Support');
+    switch (action) {
+      case 'grammar':
+        Alert.alert(
+          'Grammar Check',
+          'Checking your text for grammar errors...',
+          [{ text: 'OK' }]
+        );
+        setTimeout(() => {
+          Alert.alert(
+            'Grammar Check Complete',
+            'Found 2 potential grammar issues:\n\n• "to" should be "too" in line 1\n• Missing comma after "however" in line 3',
+            [{ text: 'Fix Issues', onPress: () => console.log('Fix grammar issues') }, { text: 'OK' }]
+          );
+        }, 1500);
+        break;
+      
+      case 'style':
+        Alert.alert(
+          'Style Enhancement',
+          'Analyzing your writing style...',
+          [{ text: 'OK' }]
+        );
+        setTimeout(() => {
+          Alert.alert(
+            'Style Enhancement Complete',
+            'Suggestions to improve your writing:\n\n• Use more active voice\n• Vary sentence length\n• Add transitional phrases',
+            [{ text: 'Apply Suggestions', onPress: () => console.log('Apply style suggestions') }, { text: 'OK' }]
+          );
+        }, 1500);
+        break;
+      
+      case 'tone':
+        Alert.alert(
+          'Tone Analysis',
+          'Analyzing the tone of your text...',
+          [{ text: 'OK' }]
+        );
+        setTimeout(() => {
+          Alert.alert(
+            'Tone Analysis Complete',
+            'Your text has a:\n\n• Formality: Professional\n• Sentiment: Positive\n• Confidence: High\n• Clarity: Good',
+            [{ text: 'View Details', onPress: () => console.log('View tone details') }, { text: 'OK' }]
+          );
+        }, 1500);
+        break;
+      
+      case 'plagiarism':
+        Alert.alert(
+          'Plagiarism Check',
+          'Checking your text for potential plagiarism...',
+          [{ text: 'OK' }]
+        );
+        setTimeout(() => {
+          Alert.alert(
+            'Plagiarism Check Complete',
+            '✅ No plagiarism detected!\n\nYour text appears to be original content.',
+            [{ text: 'View Report', onPress: () => console.log('View plagiarism report') }, { text: 'OK' }]
+          );
+        }, 2000);
+        break;
+      
+      default:
+        Alert.alert('Coming Soon', 'This feature will be available soon!');
+    }
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor="#1A1A2E" />
-      <ScrollView contentContainerStyle={styles.scrollViewContent}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
+      <StatusBar barStyle="light-content" backgroundColor={colors.background} />
+      
+      {/* Fixed Header */}
+      <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+        <View style={styles.headerLeft}>
+          <Text style={[styles.welcomeText, { color: colors.textSecondary }]}>Welcome back</Text>
+          <Text style={[styles.userName, { color: colors.text, fontSize: fontSize.large }]}>Ethan Thompson</Text>
+        </View>
+        <View style={styles.headerRight}>
+          <TouchableOpacity style={styles.notificationButton}>
+            <Bell size={24} color={colors.text} />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.profileButton}>
+            <User size={24} color={colors.text} />
+          </TouchableOpacity>
+        </View>
+      </View>
 
-        {/* Prosecraft Watermark/Background Logo - Placed within the ScrollView's content */}
-        {/* We'll use absolute positioning relative to the ScrollView's content container */}
-        <View style={styles.watermarkAbsoluteContainer}>
-            <Image
-                source={require('../assets/images/prosecraft1-logo.png')}
-                style={styles.watermarkImage}
-                resizeMode="contain"
-            />
-            <Text style={styles.watermarkText}>PROSECRAFT</Text>
+      <ScrollView contentContainerStyle={styles.scrollViewContent} showsVerticalScrollIndicator={false}>
+        
+        {/* Watermark */}
+        <View style={styles.watermarkContainer} pointerEvents="none">
+          <Image
+            source={require('../assets/images/prosecraft1-logo.png')}
+            style={styles.watermarkImage}
+            resizeMode="contain"
+          />
+          <Text style={[styles.watermarkText, { color: colors.text }]}>PROSECRAFT</Text>
         </View>
 
-        {/* Division 1: Top Section (Avatar and Draft) */}
-        <View style={styles.topSection}>
-          <View style={styles.avatarContainer}>
-            <Text style={styles.avatarText}>ET</Text>
-          </View>
-          <View style={styles.draftContainer}>
+        {/* Main Content */}
+        <View style={[styles.mainContent, { paddingHorizontal: spacing.lg }]}>
+          {/* Draft Section */}
+          <View style={[styles.draftSection, { backgroundColor: colors.surface, marginBottom: spacing.xl }]}>
             <View style={styles.draftHeader}>
-              <Text style={styles.draftTitle}>Draft</Text>
-              <Info size={18} color="#888" />
+              <View style={styles.draftHeaderLeft}>
+                <Sparkles size={20} color={colors.primary} />
+                <Text style={[styles.draftTitle, { color: colors.text, fontSize: fontSize.medium }]}>AI Writing Assistant</Text>
+              </View>
+              <TouchableOpacity style={styles.infoButton}>
+                <Info size={18} color={colors.textSecondary} />
+              </TouchableOpacity>
             </View>
-            <View style={styles.textInputWrapper}>
-              <Edit3 size={18} color="#888" style={styles.pencilIcon} />
-              <TextInput
-                style={styles.textInput}
-                placeholder="Type something..."
-                placeholderTextColor="#888"
-                multiline={true}
-              />
+            
+            <View style={styles.draftContainer}>
+              <View style={[styles.textInputWrapper, { backgroundColor: colors.border }]}>
+                <Edit3 size={18} color={colors.textSecondary} style={styles.pencilIcon} />
+                <TextInput
+                  style={[styles.textInput, { color: colors.text, fontSize: fontSize.medium }]}
+                  placeholder="Start writing your content here..."
+                  placeholderTextColor={colors.textSecondary}
+                  multiline={true}
+                  value={draftText}
+                  onChangeText={setDraftText}
+                  textAlignVertical="top"
+                />
+              </View>
+              
+              <TouchableOpacity 
+                style={[styles.analyzeButton, { backgroundColor: colors.primary }, isAnalyzing && styles.analyzeButtonDisabled]}
+                onPress={handleAnalyzeText}
+                disabled={isAnalyzing}
+              >
+                <Send size={18} color={colors.background} />
+                <Text style={[styles.analyzeButtonText, { color: colors.background, fontSize: fontSize.medium }]}>
+                  {isAnalyzing ? 'Analyzing...' : 'Analyze Text'}
+                </Text>
+              </TouchableOpacity>
             </View>
           </View>
-        </View>
 
-        {/* Division 2: Middle Menu Group */}
-        <View style={styles.middleMenuGroup}>
-          <TouchableOpacity style={styles.menuItem} onPress={handleSettingsPress}>
-            <Settings size={24} color="#00BCD4" style={styles.menuIcon} />
-            <Text style={styles.menuText}>Settings</Text>
-          </TouchableOpacity>
+          {/* Quick Actions */}
+          <View style={[styles.quickActionsSection, { marginBottom: spacing.xl }]}>
+            <Text style={[styles.sectionTitle, { color: colors.text, fontSize: fontSize.medium }]}>Quick Actions</Text>
+            <View style={styles.quickActionsGrid}>
+              <TouchableOpacity 
+                style={[styles.quickActionCard, { backgroundColor: colors.surface }]}
+                onPress={() => handleQuickAction('grammar')}
+              >
+                <Sparkles size={24} color={colors.primary} />
+                <Text style={[styles.quickActionText, { color: colors.text, fontSize: fontSize.small }]}>Grammar Check</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={[styles.quickActionCard, { backgroundColor: colors.surface }]}
+                onPress={() => handleQuickAction('style')}
+              >
+                <Edit3 size={24} color={colors.primary} />
+                <Text style={[styles.quickActionText, { color: colors.text, fontSize: fontSize.small }]}>Style Enhancement</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={[styles.quickActionCard, { backgroundColor: colors.surface }]}
+                onPress={() => handleQuickAction('tone')}
+              >
+                <MessageSquare size={24} color={colors.primary} />
+                <Text style={[styles.quickActionText, { color: colors.text, fontSize: fontSize.small }]}>Tone Analysis</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={[styles.quickActionCard, { backgroundColor: colors.surface }]}
+                onPress={() => handleQuickAction('plagiarism')}
+              >
+                <FileText size={24} color={colors.primary} />
+                <Text style={[styles.quickActionText, { color: colors.text, fontSize: fontSize.small }]}>Plagiarism Check</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
 
-          <TouchableOpacity style={styles.menuItem} onPress={handleAppearancePress}>
-            <LayoutGrid size={24} color="#00BCD4" style={styles.menuIcon} />
-            <Text style={styles.menuText}>Appearance</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.menuItem} onPress={handleBlockedAppsPress}>
-            <SquareSlash size={24} color="#00BCD4" style={styles.menuIcon} />
-            <Text style={styles.menuText}>Blocked apps</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Division 3: Bottom Menu Group */}
-        <View style={styles.bottomMenuGroup}>
-          <TouchableOpacity style={styles.menuItem} onPress={handleShareFeedbackPress}>
-            <MessageSquare size={24} color="#00BCD4" style={styles.menuIcon} />
-            <Text style={styles.menuText}>Share feedback</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.menuItem} onPress={handlePrivacyPolicyPress}>
-            <FileText size={24} color="#00BCD4" style={styles.menuIcon} />
-            <Text style={styles.menuText}>Privacy policy</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.menuItem} onPress={handleSupportPress}>
-            <LifeBuoy size={24} color="#00BCD4" style={styles.menuIcon} />
-            <Text style={styles.menuText}>Support</Text>
-          </TouchableOpacity>
+          {/* Settings & Support */}
+          <View style={[styles.settingsSection, { marginBottom: spacing.lg }]}>
+            <Text style={[styles.sectionTitle, { color: colors.text, fontSize: fontSize.medium }]}>Settings & Support</Text>
+            
+            <View style={[styles.settingsGroup, { backgroundColor: colors.surface, marginBottom: spacing.md }]}>
+              <TouchableOpacity 
+                style={[styles.settingItem, { borderBottomColor: colors.border }]}
+                onPress={() => handleNavigation('settings')}
+              >
+                <Settings size={24} color={colors.primary} style={styles.settingIcon} />
+                <Text style={[styles.settingText, { color: colors.text, fontSize: fontSize.medium }]}>Settings</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={[styles.settingItem, { borderBottomColor: colors.border }]}
+                onPress={() => handleNavigation('appearance')}
+              >
+                <LayoutGrid size={24} color={colors.primary} style={styles.settingIcon} />
+                <Text style={[styles.settingText, { color: colors.text, fontSize: fontSize.medium }]}>Appearance</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={[styles.settingItem, { borderBottomColor: colors.border }]}
+                onPress={() => handleNavigation('blockedApps')}
+              >
+                <SquareSlash size={24} color={colors.primary} style={styles.settingIcon} />
+                <Text style={[styles.settingText, { color: colors.text, fontSize: fontSize.medium }]}>Blocked Apps</Text>
+              </TouchableOpacity>
+            </View>
+            
+            <View style={[styles.supportGroup, { backgroundColor: colors.surface }]}>
+              <TouchableOpacity 
+                style={[styles.settingItem, { borderBottomColor: colors.border }]}
+                onPress={() => handleNavigation('feedback')}
+              >
+                <MessageSquare size={24} color={colors.primary} style={styles.settingIcon} />
+                <Text style={[styles.settingText, { color: colors.text, fontSize: fontSize.medium }]}>Share Feedback</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={[styles.settingItem, { borderBottomColor: colors.border }]}
+                onPress={() => handleNavigation('privacyPolicy')}
+              >
+                <FileText size={24} color={colors.primary} style={styles.settingIcon} />
+                <Text style={[styles.settingText, { color: colors.text, fontSize: fontSize.medium }]}>Privacy Policy</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={[styles.settingItem, { borderBottomColor: colors.border }]}
+                onPress={() => handleNavigation('support')}
+              >
+                <LifeBuoy size={24} color={colors.primary} style={styles.settingIcon} />
+                <Text style={[styles.settingText, { color: colors.text, fontSize: fontSize.medium }]}>Support</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -136,120 +325,183 @@ export default HomeScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#1A1A2E', // Dark background for the whole screen
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+  },
+  headerLeft: {
+    flex: 1,
+  },
+  welcomeText: {
+    fontSize: 14,
+    marginBottom: 4,
+  },
+  userName: {
+    fontWeight: 'bold',
+  },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  notificationButton: {
+    padding: 8,
+    marginRight: 12,
+  },
+  profileButton: {
+    padding: 8,
   },
   scrollViewContent: {
-    flexGrow: 1, // Allows content to grow within ScrollView
-    paddingVertical: 10, // Overall vertical padding for the content blocks
+    flexGrow: 1,
+    paddingBottom: 30,
   },
-  // Main Divisions Styles
-  topSection: {
-    backgroundColor: '#2B2B3A', // Background color for the top section
-    paddingVertical: 20,
-    paddingHorizontal: 20,
-    borderRadius: 15, // Match card-like appearance
-    marginHorizontal: 15, // Space from screen edges
-    marginBottom: 10, // Space between this and next division
-  },
-  middleMenuGroup: {
-    backgroundColor: '#2B2B3A', // Background for the middle menu group
-    borderRadius: 15,
-    marginHorizontal: 15,
-    marginBottom: 10, // Space between this and next division
-    overflow: 'hidden', // Ensures inner items respect border radius
-  },
-  bottomMenuGroup: {
-    backgroundColor: '#2B2B3A', // Background for the bottom menu group
-    borderRadius: 15,
-    marginHorizontal: 15,
-    // No marginBottom if it's the last division, or adjust as needed
-  },
-
-  // Content Styles (Avatar, Draft)
-  avatarContainer: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#00BCD4',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  avatarText: {
-    color: '#1A1A2E',
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  draftContainer: {
-    // No specific background for this, it's part of topSection
-  },
-  draftHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  draftTitle: {
-    color: '#FFF',
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginRight: 8,
-  },
-  textInputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    backgroundColor: '#3A3A4A',
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    paddingVertical: 12,
-  },
-  pencilIcon: {
-    marginRight: 10,
-    marginTop: 3,
-  },
-  textInput: {
-    flex: 1,
-    color: '#FFF',
-    fontSize: 16,
-    minHeight: 40,
-    paddingVertical: 0,
-  },
-
-  // Menu Item Styles (No individual borders)
-  menuItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 18,
-    paddingHorizontal: 20,
-    // Removed borderBottomWidth and borderBottomColor from here
-  },
-  menuIcon: {
-    marginRight: 15,
-  },
-  menuText: {
-    color: '#FFF',
-    fontSize: 18,
-  },
-
-  // Watermark/Background Logo Styles
-  watermarkAbsoluteContainer: {
+  watermarkContainer: {
     position: 'absolute',
-    top: '40%', // Adjust to visually center in the background
+    top: '40%',
     left: 0,
     right: 0,
     alignItems: 'center',
     justifyContent: 'center',
-    zIndex: -1, // Ensure it's behind other content
+    zIndex: -1,
   },
   watermarkImage: {
-    width: 250, // Made bigger
-    height: 250, // Made bigger
-    opacity: 0.15, // More visible, but still a watermark
+    width: width * 0.6,
+    height: width * 0.6,
+    opacity: 0.1,
   },
   watermarkText: {
-    color: '#FFF',
-    fontSize: 30, // Made bigger
+    fontSize: 28,
     fontWeight: 'bold',
-    opacity: 0.15, // More visible
-    marginTop: 10,
+    opacity: 0.1,
+    marginTop: 8,
+    letterSpacing: 2,
+  },
+  mainContent: {
+    paddingTop: 20,
+  },
+  draftSection: {
+    borderRadius: 20,
+    padding: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  draftHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  draftHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  draftTitle: {
+    fontWeight: 'bold',
+    marginLeft: 8,
+  },
+  infoButton: {
+    padding: 4,
+  },
+  draftContainer: {
+    gap: 16,
+  },
+  textInputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    minHeight: 120,
+  },
+  pencilIcon: {
+    marginRight: 12,
+    marginTop: 4,
+  },
+  textInput: {
+    flex: 1,
+    lineHeight: 24,
+    paddingVertical: 0,
+  },
+  analyzeButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    gap: 8,
+  },
+  analyzeButtonDisabled: {
+    opacity: 0.7,
+  },
+  analyzeButtonText: {
+    fontWeight: '600',
+  },
+  quickActionsSection: {
+  },
+  sectionTitle: {
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
+  quickActionsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  quickActionCard: {
+    borderRadius: 16,
+    padding: 20,
+    alignItems: 'center',
+    width: (width - 52) / 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  quickActionText: {
+    fontWeight: '600',
+    marginTop: 8,
+    textAlign: 'center',
+  },
+  settingsSection: {
+  },
+  settingsGroup: {
+    borderRadius: 16,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  supportGroup: {
+    borderRadius: 16,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  settingItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 18,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+  },
+  settingIcon: {
+    marginRight: 16,
+  },
+  settingText: {
+    fontWeight: '500',
   },
 });

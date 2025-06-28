@@ -1,283 +1,477 @@
-import React, { useState, useEffect, useRef } from 'react'; // Import useState, useEffect, useRef
+import React, { useState } from 'react';
 import {
   View,
   Text,
-  TextInput,
-  TouchableOpacity,
   StyleSheet,
   StatusBar,
+  TouchableOpacity,
+  TextInput,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Alert,
   Image,
 } from 'react-native';
-import { ChevronRight, Sparkles, ArrowLeft } from 'lucide-react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { ArrowLeft, Eye, EyeOff, Mail, User, CheckCircle, ChevronRight } from 'lucide-react-native';
+import { useTheme } from '../../hooks/useTheme';
 
-const RegisterScreen = () => { // Renamed component to RegisterScreen
+const RegisterScreen = () => {
   const router = useRouter();
-  const [email, setEmail] = useState(''); // State for email input
-  const [emailError, setEmailError] = useState(false); // State for email error
-  const errorTimerRef = useRef<NodeJS.Timeout | null>(null); // Ref for timer ID
+  const { colors, spacing, fontSize } = useTheme();
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
 
-  const handleGoToLogin = () => { // Back button now goes to login
-    router.push('/login'); // Navigate to the login screen
+  const handleGoBack = () => {
+    router.push('/login');
   };
 
-  const handleSignUp = () => { // New function for Sign Up button
-    // Clear any existing timer when attempting to sign up
-    if (errorTimerRef.current) {
-      clearTimeout(errorTimerRef.current);
-    }
-
-    if (email.trim() === '') { // Validate email input
-      setEmailError(true); // Set error state to true
-      // Set a timer to clear the error after 3 seconds
-      //@ts-expect-error
-      errorTimerRef.current = setTimeout(() => {
-        setEmailError(false);
-        errorTimerRef.current = null;
-      }, 3000); // 3000ms = 3 seconds
-    } else {
-      setEmailError(false); // Clear error state if input is valid
-      console.log('Registering with email:', email);
-      // In a real app, you would proceed with registration logic
-      // e.g., calling an API, then navigating to a success screen or home
-      // router.push('/home');
-    }
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
   };
 
-  // Function to handle text input changes and clear error immediately
-  const handleEmailChange = (text: string) => {
-    setEmail(text);
-    if (emailError) { // If there was an error showing
-      setEmailError(false); // Clear error immediately when user types
-      if (errorTimerRef.current) { // Clear the auto-dismiss timer
-        clearTimeout(errorTimerRef.current);
-        errorTimerRef.current = null;
-      }
-    }
+  const validatePassword = (password: string) => {
+    return password.length >= 8;
   };
 
-  // Clean up the timer when the component unmounts
-  useEffect(() => {
-    return () => {
-      if (errorTimerRef.current) {
-        clearTimeout(errorTimerRef.current);
-      }
-    };
-  }, []);
+  const handleSignUp = async () => {
+    if (!fullName.trim()) {
+      Alert.alert('Error', 'Please enter your full name');
+      return;
+    }
+
+    if (!email.trim()) {
+      Alert.alert('Error', 'Please enter your email address');
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      Alert.alert('Error', 'Please enter a valid email address');
+      return;
+    }
+
+    if (!password.trim()) {
+      Alert.alert('Error', 'Please enter a password');
+      return;
+    }
+
+    if (!validatePassword(password)) {
+      Alert.alert('Error', 'Password must be at least 8 characters long');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      Alert.alert('Error', 'Passwords do not match');
+      return;
+    }
+
+    if (!agreedToTerms) {
+      Alert.alert('Error', 'Please agree to the Terms of Service and Privacy Policy');
+      return;
+    }
+
+    setIsLoading(true);
+    
+    // Simulate API call
+    setTimeout(() => {
+      setIsLoading(false);
+      router.push('/home');
+    }, 1500);
+  };
+
+  const handleSocialSignUp = (provider: string) => {
+    Alert.alert('Coming Soon', `${provider} sign-up will be available soon!`);
+  };
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#1A1A2E" />
-
-      {/* Back Button */}
-      <TouchableOpacity style={styles.backButton} onPress={handleGoToLogin}>
-        <ArrowLeft size={28} color="#FFF" />
-      </TouchableOpacity>
-
-      {/* Header Section with Logo and App Name */}
-      <View style={styles.headerSection}>
-        <Image
-          source={require('../assets/images/prosecraft1-logo.png')}
-          style={styles.logoImage}
-        />
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <StatusBar barStyle="light-content" backgroundColor={colors.background} />
+      
+      {/* Fixed Header */}
+      <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+        <TouchableOpacity style={styles.backButton} onPress={handleGoBack}>
+          <ArrowLeft size={24} color={colors.text} />
+        </TouchableOpacity>
       </View>
 
-      {/* Register Card */}
-      <View style={styles.registerCard}> {/* Changed to registerCard for clarity */}
-        {/* Sign Up Header */}
-        <View style={styles.signUpHeader}> {/* Changed to signUpHeader for clarity */}
-          <Text style={styles.signUpText}>Sign up</Text> {/* Changed text to "Sign up" */}
-          <TouchableOpacity onPress={handleGoToLogin}> {/* Link to Login screen */}
-            <Text style={styles.alreadyHaveAccountText}>I already have an account</Text> {/* Changed text */}
-          </TouchableOpacity>
-        </View>
-
-        {/* Email Input */}
-        <TextInput
-          style={[
-            styles.emailInput,
-            emailError && styles.emailInputError // Apply error style conditionally
-          ]}
-          placeholder="Email"
-          placeholderTextColor="#888"
-          keyboardType="email-address"
-          autoCapitalize="none"
-          value={email} // Bind value to state
-          onChangeText={handleEmailChange} // Update state on text change
-        />
-        {/* Error message tooltip */}
-        {emailError && (
-          <Text style={styles.errorMessage}>Email field must not be empty.</Text>
-        )}
-
-        {/* Sign Up Button */}
-        <TouchableOpacity style={styles.signUpButton} onPress={handleSignUp}> {/* Attach new handler */}
-          <Text style={styles.signUpButtonText}>Sign up</Text> {/* Changed text to "Sign up" */}
-        </TouchableOpacity>
-
-        {/* Can't Sign Up Link */}
-        <TouchableOpacity style={styles.cantSignUpButton}> {/* Changed to cantSignUpButton for clarity */}
-          <Text style={styles.cantSignUpText}>Can't sign up?</Text> {/* Changed text to "Can't sign up?" */}
-        </TouchableOpacity>
-
-        {/* Social Sign-up Options */}
-        <View style={styles.socialLoginContainer}>
-          {/* Google Sign-up */}
-          <TouchableOpacity style={styles.socialButton}>
+      <KeyboardAvoidingView 
+        style={styles.keyboardView}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+          
+          {/* Logo Section */}
+          <View style={styles.logoSection}>
             <Image
-              source={{ uri: 'https://img.icons8.com/color/48/google-logo.png' }}
-              style={styles.socialIcon}
+              source={require('../assets/images/prosecraft1-logo.png')}
+              style={styles.logo}
+              resizeMode="contain"
             />
-            <Text style={styles.socialButtonText}>Sign up with Google</Text> {/* Changed text */}
-            <ChevronRight size={24} color="#888" />
-          </TouchableOpacity>
+            <Text style={[styles.appName, { color: colors.text }]}>Prosecraft</Text>
+          </View>
 
-          {/* Facebook Sign-up */}
-          <TouchableOpacity style={styles.socialButton}>
-            <Image
-              source={{ uri: 'https://img.icons8.com/color/48/facebook-new.png' }}
-              style={styles.socialIcon}
-            />
-            <Text style={styles.socialButtonText}>Sign up with Facebook</Text> {/* Changed text */}
-            <ChevronRight size={24} color="#888" />
-          </TouchableOpacity>
+          {/* Register Form */}
+          <View style={styles.formContainer}>
+            <View style={styles.formHeader}>
+              <Text style={[styles.formTitle, { color: colors.text }]}>Create account</Text>
+              <Text style={[styles.formSubtitle, { color: colors.textSecondary }]}>Join Prosecraft and enhance your writing</Text>
+            </View>
 
-          {/* Apple Sign-up */}
-          <TouchableOpacity style={styles.socialButton}>
-            <Image
-              source={{ uri: 'https://img.icons8.com/ios-filled/50/mac-os.png' }}
-              style={styles.socialIcon}
-            />
-            <Text style={styles.socialButtonText}>Sign up with Apple</Text> {/* Changed text */}
-            <ChevronRight size={24} color="#888" />
-          </TouchableOpacity>
-        </View>
-      </View>
-    </View>
+            {/* Full Name Input */}
+            <View style={styles.inputContainer}>
+              <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                <User size={20} color={colors.textSecondary} style={styles.inputIcon} />
+                <TextInput
+                  style={[styles.input, { color: colors.text }]}
+                  placeholder="Full name"
+                  placeholderTextColor={colors.textSecondary}
+                  autoCapitalize="words"
+                  autoCorrect={false}
+                  value={fullName}
+                  onChangeText={setFullName}
+                />
+              </View>
+            </View>
+
+            {/* Email Input */}
+            <View style={styles.inputContainer}>
+              <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                <Mail size={20} color={colors.textSecondary} style={styles.inputIcon} />
+                <TextInput
+                  style={[styles.input, { color: colors.text }]}
+                  placeholder="Email address"
+                  placeholderTextColor={colors.textSecondary}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  value={email}
+                  onChangeText={setEmail}
+                />
+              </View>
+            </View>
+
+            {/* Password Input */}
+            <View style={styles.inputContainer}>
+              <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                <TextInput
+                  style={[styles.input, styles.passwordInput, { color: colors.text }]}
+                  placeholder="Password"
+                  placeholderTextColor={colors.textSecondary}
+                  secureTextEntry={!showPassword}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  value={password}
+                  onChangeText={setPassword}
+                />
+                <TouchableOpacity 
+                  style={styles.eyeIcon}
+                  onPress={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <EyeOff size={20} color={colors.textSecondary} />
+                  ) : (
+                    <Eye size={20} color={colors.textSecondary} />
+                  )}
+                </TouchableOpacity>
+              </View>
+              {password.length > 0 && (
+                <Text style={[
+                  styles.passwordHint,
+                  validatePassword(password) ? styles.passwordHintValid : styles.passwordHintInvalid
+                ]}>
+                  {validatePassword(password) ? '✓ Password is strong' : 'Password must be at least 8 characters'}
+                </Text>
+              )}
+            </View>
+
+            {/* Confirm Password Input */}
+            <View style={styles.inputContainer}>
+              <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                <TextInput
+                  style={[styles.input, styles.passwordInput, { color: colors.text }]}
+                  placeholder="Confirm password"
+                  placeholderTextColor={colors.textSecondary}
+                  secureTextEntry={!showConfirmPassword}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  value={confirmPassword}
+                  onChangeText={setConfirmPassword}
+                />
+                <TouchableOpacity 
+                  style={styles.eyeIcon}
+                  onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff size={20} color={colors.textSecondary} />
+                  ) : (
+                    <Eye size={20} color={colors.textSecondary} />
+                  )}
+                </TouchableOpacity>
+              </View>
+              {confirmPassword.length > 0 && (
+                <Text style={[
+                  styles.passwordHint,
+                  password === confirmPassword ? styles.passwordHintValid : styles.passwordHintInvalid
+                ]}>
+                  {password === confirmPassword ? '✓ Passwords match' : 'Passwords do not match'}
+                </Text>
+              )}
+            </View>
+
+            {/* Terms Agreement */}
+            <TouchableOpacity 
+              style={styles.termsContainer}
+              onPress={() => setAgreedToTerms(!agreedToTerms)}
+            >
+              <View style={[styles.checkbox, agreedToTerms && styles.checkboxChecked]}>
+                {agreedToTerms && <CheckCircle size={16} color={colors.background} />}
+              </View>
+              <Text style={[styles.termsText, { color: colors.textSecondary }]}>
+                I agree to the{' '}
+                <Text style={[styles.termsLink, { color: colors.primary }]}>Terms of Service</Text>
+                {' '}and{' '}
+                <Text style={[styles.termsLink, { color: colors.primary }]}>Privacy Policy</Text>
+              </Text>
+            </TouchableOpacity>
+
+            {/* Sign Up Button */}
+            <TouchableOpacity 
+              style={[styles.signUpButton, { backgroundColor: colors.primary }, isLoading && styles.signUpButtonDisabled]}
+              onPress={handleSignUp}
+              disabled={isLoading}
+            >
+              <Text style={[styles.signUpButtonText, { color: colors.background }]}>
+                {isLoading ? 'Creating account...' : 'Create Account'}
+              </Text>
+            </TouchableOpacity>
+
+            {/* Divider */}
+            <View style={styles.divider}>
+              <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
+              <Text style={[styles.dividerText, { color: colors.textSecondary }]}>or continue with</Text>
+              <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
+            </View>
+
+            {/* Social Sign-up Options */}
+            <View style={styles.socialContainer}>
+              <TouchableOpacity 
+                style={[styles.socialButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
+                onPress={() => handleSocialSignUp('Google')}
+              >
+                <Text style={[styles.socialButtonText, { color: colors.text }]}>Google</Text>
+                <ChevronRight size={16} color={colors.textSecondary} />
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={[styles.socialButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
+                onPress={() => handleSocialSignUp('Apple')}
+              >
+                <Text style={[styles.socialButtonText, { color: colors.text }]}>Apple</Text>
+                <ChevronRight size={16} color={colors.textSecondary} />
+              </TouchableOpacity>
+            </View>
+
+            {/* Sign In Link */}
+            <View style={styles.signInContainer}>
+              <Text style={[styles.signInText, { color: colors.textSecondary }]}>Already have an account? </Text>
+              <TouchableOpacity onPress={handleGoBack}>
+                <Text style={[styles.signInLink, { color: colors.primary }]}>Sign in</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
-export default RegisterScreen; // Export the renamed component
+export default RegisterScreen;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1A1A2E',
+  },
+  keyboardView: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingHorizontal: 24,
+  },
+  header: {
+    flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
   },
   backButton: {
-    position: 'absolute',
-    top: 20, // Adjusted for consistency with LoginScreen
-    left: 20,
-    zIndex: 10,
-    padding: 10,
+    padding: 8,
   },
-  headerSection: {
+  logoSection: {
     alignItems: 'center',
+    marginTop: 20,
     marginBottom: 40,
   },
-  logoIcon: {
-    marginBottom: 10,
-  },
-  logoImage: {
-    width: 170,
-    height: 170,
-    resizeMode: 'contain',
-    marginBottom: 10,
+  logo: {
+    width: 80,
+    height: 80,
+    marginBottom: 16,
   },
   appName: {
-    color: '#FFF',
     fontSize: 24,
     fontWeight: 'bold',
+    letterSpacing: 1,
   },
-  registerCard: { // Renamed from loginCard
-    backgroundColor: '#2B2B3A',
-    borderRadius: 15,
-    padding: 20,
-    width: '100%',
-    maxWidth: 400,
+  formContainer: {
+    flex: 1,
   },
-  signUpHeader: { // Renamed from signInHeader
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
-    marginBottom: 30,
+  formHeader: {
+    marginBottom: 32,
   },
-  signUpText: { // Renamed from signInText
-    color: '#FFF',
+  formTitle: {
     fontSize: 28,
     fontWeight: 'bold',
+    marginBottom: 8,
   },
-  alreadyHaveAccountText: { // Renamed from dontHaveAccountText
-    color: '#00BCD4',
+  formSubtitle: {
     fontSize: 16,
-    textDecorationLine: 'underline',
+    lineHeight: 24,
   },
-  emailInput: {
-    backgroundColor: '#3A3A4A',
-    color: '#FFF',
-    fontSize: 18,
-    padding: 15,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#3A3A4A', // Default border color same as background
-    marginBottom: 20, // Default margin bottom
-  },
-  emailInputError: {
-    borderColor: '#FF6347', // Red border color for error
-  },
-  errorMessage: {
-    color: '#FF6347', // Red text for error message
-    fontSize: 14,
-    marginTop: -15, // Move up to be closer to the input
-    marginBottom: 15, // Space after the error message
-    textAlign: 'left',
-    paddingLeft: 5,
-  },
-  signUpButton: { // Renamed from continueButton
-    backgroundColor: '#00BCD4',
-    paddingVertical: 18,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginTop: 0,
+  inputContainer: {
     marginBottom: 20,
   },
-  signUpButtonText: { // Renamed from continueButtonText
-    color: '#1A1A2E',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  cantSignUpButton: { // Renamed from cantSignInButton
-    alignSelf: 'center',
-    marginBottom: 30,
-  },
-  cantSignUpText: { // Renamed from cantSignInText
-    color: '#00BCD4',
-    fontSize: 16,
-    textDecorationLine: 'underline',
-  },
-  socialLoginContainer: {
-    width: '100%',
-  },
-  socialButton: {
+  inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#3A3A4A',
-    paddingVertical: 15,
-    paddingHorizontal: 15,
-    borderRadius: 10,
-    marginBottom: 15,
-    justifyContent: 'space-between',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    borderWidth: 1,
   },
-  socialIcon: {
-    width: 24,
-    height: 24,
-    marginRight: 15,
+  inputIcon: {
+    marginRight: 12,
+  },
+  input: {
+    flex: 1,
+    fontSize: 16,
+    paddingVertical: 0,
+  },
+  passwordInput: {
+    paddingRight: 40,
+  },
+  eyeIcon: {
+    position: 'absolute',
+    right: 16,
+    padding: 4,
+  },
+  passwordHint: {
+    fontSize: 12,
+    marginTop: 8,
+    marginLeft: 4,
+  },
+  passwordHintValid: {
+    color: '#4CAF50',
+  },
+  passwordHintInvalid: {
+    color: '#FF6B6B',
+  },
+  termsContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 24,
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 4,
+    borderWidth: 2,
+    marginRight: 12,
+    marginTop: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  checkboxChecked: {
+    backgroundColor: '#00BCD4',
+    borderColor: '#00BCD4',
+  },
+  termsText: {
+    flex: 1,
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  termsLink: {
+    fontWeight: '500',
+  },
+  signUpButton: {
+    borderRadius: 12,
+    paddingVertical: 16,
+    alignItems: 'center',
+    marginBottom: 24,
+    shadowColor: '#00BCD4',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  signUpButtonDisabled: {
+    opacity: 0.7,
+  },
+  signUpButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+  },
+  dividerText: {
+    fontSize: 14,
+    marginHorizontal: 16,
+  },
+  socialContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 32,
+  },
+  socialButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderRadius: 12,
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    marginHorizontal: 4,
+    borderWidth: 1,
   },
   socialButtonText: {
-    color: '#FFF',
-    fontSize: 18,
-    flex: 1,
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  signInContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  signInText: {
+    fontSize: 14,
+  },
+  signInLink: {
+    fontSize: 14,
+    fontWeight: '600',
   },
 });

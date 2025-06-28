@@ -1,29 +1,29 @@
+import { useRouter } from 'expo-router';
+import {
+    ArrowLeft,
+    Globe,
+    MoreVertical,
+    Sparkles,
+    Star,
+    Wind,
+} from 'lucide-react-native';
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  StatusBar,
-  TouchableOpacity,
-  ScrollView,
-  Image,
-  Switch, // Import Switch for toggle buttons
+    Dimensions,
+    ScrollView,
+    StatusBar,
+    StyleSheet,
+    Switch,
+    Text,
+    TouchableOpacity,
+    View
 } from 'react-native';
-import {
-  ArrowLeft,        // Back arrow icon
-  Wind,            // Prosecraft Assistant (swirl-like, or choose another if more fitting)
-  Star,            // Quick Toggle (star outline)
-  Globe,           // English UK (globe icon)
-  Sparkles,        // Generative AI (sparkles icon)
-  MoreVertical,    // Three dots for language settings
-} from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+
+const { width } = Dimensions.get('window');
 
 const SettingsScreen = () => {
   const router = useRouter();
-
-  // State for each toggle switch
   const [prosecraftAssistantEnabled, setProsecraftAssistantEnabled] = useState(true);
   const [quickToggleEnabled, setQuickToggleEnabled] = useState(true);
   const [generativeAIEnabled, setGenerativeAIEnabled] = useState(true);
@@ -33,15 +33,13 @@ const SettingsScreen = () => {
   };
 
   const handleLanguageSelect = () => {
-    console.log('Open language selection modal/screen');
-    // Example: router.push('/language-select');
+    // Open language selection modal/screen
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="light-content" backgroundColor="#1A1A2E" />
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
-
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={handleGoBack} style={styles.backButton}>
@@ -91,7 +89,7 @@ const SettingsScreen = () => {
               <Text style={styles.itemTitle}>English UK</Text>
               <Text style={styles.itemDescription}>Select your language</Text>
             </View>
-            <MoreVertical size={24} color="#888" /> {/* Three dots icon */}
+            <MoreVertical size={24} color="#888" />
           </TouchableOpacity>
 
           {/* Generative AI */}
@@ -110,7 +108,6 @@ const SettingsScreen = () => {
             />
           </View>
         </View>
-
       </ScrollView>
     </SafeAreaView>
   );
@@ -121,49 +118,54 @@ export default SettingsScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#1A1A2E', // Dark background for the whole screen
+    backgroundColor: '#1A1A2E',
   },
   scrollViewContent: {
     flexGrow: 1,
-    // Removed all padding from scrollViewContent to allow header/group to touch edges
+    paddingBottom: 30,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 15,
-    paddingVertical: 15,
-    backgroundColor: '#2B2B3A', // Header background
-    marginBottom: 0, // No space below header
+    paddingHorizontal: 18,
+    paddingVertical: 18,
+    backgroundColor: '#2B2B3A',
+    marginBottom: 0,
+    borderBottomWidth: 1,
+    borderBottomColor: '#35354A',
   },
   backButton: {
-    paddingRight: 15,
+    paddingRight: 18,
   },
   headerTitle: {
     color: '#FFF',
     fontSize: 22,
     fontWeight: 'bold',
+    letterSpacing: 0.5,
   },
   settingsGroup: {
-    backgroundColor: '#2B2B3A', // Background for the group of settings items
-    marginHorizontal: 0, // No horizontal margin
-    paddingTop: 10, // Padding from the top of this group (from header)
-    // To make it span height fully, if content is short, we can add flex: 1
-    // or rely on the safeArea's flex:1 and scrollViewContent's flexGrow:1
-    // The current setup allows it to grow and fill, but doesn't force a minimum height beyond content.
-    // If you explicitly want this block to stretch to the bottom when content is short:
-    // flex: 1,
+    backgroundColor: '#2B2B3A',
+    marginHorizontal: 18,
+    marginTop: 24,
+    borderRadius: 18,
     overflow: 'hidden',
+    paddingVertical: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 2,
   },
   settingItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 15,
-    paddingHorizontal: 20,
+    paddingVertical: 22,
+    paddingHorizontal: 24,
     borderBottomWidth: 1,
-    borderBottomColor: '#3A3A4A', // Separator line between items
+    borderBottomColor: '#35354A',
   },
   itemIcon: {
-    marginRight: 15,
+    marginRight: 18,
   },
   itemTextContainer: {
     flex: 1,
@@ -174,9 +176,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 2,
+    letterSpacing: 0.2,
   },
   itemDescription: {
     color: '#BBBBBB',
     fontSize: 13,
+    fontWeight: '500',
   },
 });
